@@ -1,5 +1,5 @@
-module Stripe
-  class CardError < StripeError
+module Webpay
+  class CardError < WebpayError
     attr_reader :param, :code
 
     def initialize(message, param, code, http_status=nil, http_body=nil, json_body=nil)

@@ -8,7 +8,7 @@ require 'rest-client'
 require 'cgi'
 require 'uri'
 
-class TestStripeRuby < Test::Unit::TestCase
+class TestWebpayRuby < Test::Unit::TestCase
   include Mocha
 
   context "Util" do
@@ -32,7 +32,7 @@ class TestStripeRuby < Test::Unit::TestCase
         }
       }
 
-      symbolized = Stripe::Util.symbolize_names(start)
+      symbolized = Webpay::Util.symbolize_names(start)
       assert_equal(finish, symbolized)
     end
   end
@@ -40,21 +40,21 @@ class TestStripeRuby < Test::Unit::TestCase
   context "API Bindings" do
     setup do
       @mock = mock
-      Stripe.mock_rest_client = @mock
+      Webpay.mock_rest_client = @mock
     end
 
     teardown do
-      Stripe.mock_rest_client = nil
+      Webpay.mock_rest_client = nil
     end
 
     should "creating a new APIResource should not fetch over the network" do
       @mock.expects(:get).never
-      c = Stripe::Customer.new("someid")
+      c = Webpay::Customer.new("someid")
     end
 
     should "creating a new APIResource from a hash should not fetch over the network" do
       @mock.expects(:get).never
-      c = Stripe::Customer.construct_from({
+      c = Webpay::Customer.construct_from({
         :id => "somecustomer",
         :card => {:id => "somecard", :object => "card"},
         :object => "customer"
@@ -64,39 +64,39 @@ class TestStripeRuby < Test::Unit::TestCase
     should "setting an attribute should not cause a network request" do
       @mock.expects(:get).never
       @mock.expects(:post).never
-      c = Stripe::Customer.new("test_customer");
+      c = Webpay::Customer.new("test_customer");
       c.card = {:id => "somecard", :object => "card"}
     end
 
     should "accessing id should not issue a fetch" do
       @mock.expects(:get).never
-      c = Stripe::Customer.new("test_customer");
+      c = Webpay::Customer.new("test_customer");
       c.id
     end
 
     should "not specifying api credentials should raise an exception" do
-      Stripe.api_key = nil
-      assert_raises Stripe::AuthenticationError do
-        Stripe::Customer.new("test_customer").refresh
+      Webpay.api_key = nil
+      assert_raises Webpay::AuthenticationError do
+        Webpay::Customer.new("test_customer").refresh
       end
     end
 
     should "specifying invalid api credentials should raise an exception" do
-      Stripe.api_key = "invalid"
+      Webpay.api_key = "invalid"
       response = test_response(test_invalid_api_key_error, 401)
-      assert_raises Stripe::AuthenticationError do
+      assert_raises Webpay::AuthenticationError do
         @mock.expects(:get).once.raises(RestClient::ExceptionWithResponse.new(response, 401))
-        Stripe::Customer.retrieve("failing_customer")
+        Webpay::Customer.retrieve("failing_customer")
       end
     end
 
     should "AuthenticationErrors should have an http status, http body, and JSON body" do
-      Stripe.api_key = "invalid"
+      Webpay.api_key = "invalid"
       response = test_response(test_invalid_api_key_error, 401)
       begin
         @mock.expects(:get).once.raises(RestClient::ExceptionWithResponse.new(response, 401))
-        Stripe::Customer.retrieve("failing_customer")
-      rescue Stripe::AuthenticationError => e
+        Webpay::Customer.retrieve("failing_customer")
+      rescue Webpay::AuthenticationError => e
         assert_equal(401, e.http_status)
         assert_equal(true, !!e.http_body)
         assert_equal(true, !!e.json_body[:error][:message])
@@ -106,19 +106,19 @@ class TestStripeRuby < Test::Unit::TestCase
 
     context "with valid credentials" do
       setup do
-        Stripe.api_key="foo"
+        Webpay.api_key="foo"
       end
 
       teardown do
-        Stripe.api_key=nil
+        Webpay.api_key=nil
       end
 
       should "a 400 should give an InvalidRequestError with http status, body, and JSON body" do
         response = test_response(test_missing_id_error, 400)
         @mock.expects(:get).once.raises(RestClient::ExceptionWithResponse.new(response, 404))
         begin
-          Stripe::Customer.retrieve("foo")
-        rescue Stripe::InvalidRequestError => e
+          Webpay::Customer.retrieve("foo")
+        rescue Webpay::InvalidRequestError => e
           assert_equal(400, e.http_status)
           assert_equal(true, !!e.http_body)
           assert_equal(true, e.json_body.kind_of?(Hash))
@@ -129,8 +129,8 @@ class TestStripeRuby < Test::Unit::TestCase
         response = test_response(test_missing_id_error, 401)
         @mock.expects(:get).once.raises(RestClient::ExceptionWithResponse.new(response, 404))
         begin
-          Stripe::Customer.retrieve("foo")
-        rescue Stripe::AuthenticationError => e
+          Webpay::Customer.retrieve("foo")
+        rescue Webpay::AuthenticationError => e
           assert_equal(401, e.http_status)
           assert_equal(true, !!e.http_body)
           assert_equal(true, e.json_body.kind_of?(Hash))
@@ -141,8 +141,8 @@ class TestStripeRuby < Test::Unit::TestCase
         response = test_response(test_missing_id_error, 402)
         @mock.expects(:get).once.raises(RestClient::ExceptionWithResponse.new(response, 404))
         begin
-          Stripe::Customer.retrieve("foo")
-        rescue Stripe::CardError => e
+          Webpay::Customer.retrieve("foo")
+        rescue Webpay::CardError => e
           assert_equal(402, e.http_status)
           assert_equal(true, !!e.http_body)
           assert_equal(true, e.json_body.kind_of?(Hash))
@@ -153,8 +153,8 @@ class TestStripeRuby < Test::Unit::TestCase
         response = test_response(test_missing_id_error, 404)
         @mock.expects(:get).once.raises(RestClient::ExceptionWithResponse.new(response, 404))
         begin
-          Stripe::Customer.retrieve("foo")
-        rescue Stripe::InvalidRequestError => e
+          Webpay::Customer.retrieve("foo")
+        rescue Webpay::InvalidRequestError => e
           assert_equal(404, e.http_status)
           assert_equal(true, !!e.http_body)
           assert_equal(true, e.json_body.kind_of?(Hash))
@@ -168,45 +168,45 @@ class TestStripeRuby < Test::Unit::TestCase
           (url =~ %r{^https://api.stripe.com/v1/charges?} &&
            query.keys.sort == ['offset', 'sad'])
         end.returns(test_response({ :count => 1, :data => [test_charge] }))
-        c = Stripe::Charge.all(:count => nil, :offset => 5, :sad => false)
+        c = Webpay::Charge.all(:count => nil, :offset => 5, :sad => false)
 
         @mock.expects(:post).with('https://api.stripe.com/v1/charges', nil, { :amount => 50, :currency => 'usd', :card => {} }).returns(test_response({ :count => 1, :data => [test_charge] }))
-        c = Stripe::Charge.create(:amount => 50, :currency => 'usd', :card => { :number => nil })
+        c = Webpay::Charge.create(:amount => 50, :currency => 'usd', :card => { :number => nil })
       end
 
       should "requesting with a unicode ID should result in a request" do
         response = test_response(test_missing_id_error, 404)
         @mock.expects(:get).once.with("https://api.stripe.com/v1/customers/%E2%98%83", nil, nil).raises(RestClient::ExceptionWithResponse.new(response, 404))
-        c = Stripe::Customer.new("☃")
-        assert_raises(Stripe::InvalidRequestError) { c.refresh }
+        c = Webpay::Customer.new("☃")
+        assert_raises(Webpay::InvalidRequestError) { c.refresh }
       end
 
       should "requesting with no ID should result in an InvalidRequestError with no request" do
-        c = Stripe::Customer.new
-        assert_raises(Stripe::InvalidRequestError) { c.refresh }
+        c = Webpay::Customer.new
+        assert_raises(Webpay::InvalidRequestError) { c.refresh }
       end
 
       should "making a GET request with parameters should have a query string and no body" do
         params = { :limit => 1 }
         @mock.expects(:get).once.with("https://api.stripe.com/v1/charges?limit=1", nil, nil).returns(test_response([test_charge]))
-        c = Stripe::Charge.all(params)
+        c = Webpay::Charge.all(params)
       end
 
       should "making a POST request with parameters should have a body and no query string" do
         params = { :amount => 100, :currency => 'usd', :card => 'sc_token' }
         @mock.expects(:post).once.with { |url, get, post| get.nil? and post == params }.returns(test_response(test_charge))
-        c = Stripe::Charge.create(params)
+        c = Webpay::Charge.create(params)
       end
 
       should "loading an object should issue a GET request" do
         @mock.expects(:get).once.returns(test_response(test_customer))
-        c = Stripe::Customer.new("test_customer")
+        c = Webpay::Customer.new("test_customer")
         c.refresh
       end
 
       should "using array accessors should be the same as the method interface" do
         @mock.expects(:get).once.returns(test_response(test_customer))
-        c = Stripe::Customer.new("test_customer")
+        c = Webpay::Customer.new("test_customer")
         c.refresh
         assert_equal c.created, c[:created]
         assert_equal c.created, c['created']
@@ -216,20 +216,20 @@ class TestStripeRuby < Test::Unit::TestCase
 
       should "accessing a property other than id or parent on an unfetched object should fetch it" do
         @mock.expects(:get).once.returns(test_response(test_customer))
-        c = Stripe::Customer.new("test_customer")
+        c = Webpay::Customer.new("test_customer")
         c.charges
       end
 
       should "updating an object should issue a POST request with only the changed properties" do
         @mock.expects(:post).with("https://api.stripe.com/v1/customers/c_test_customer", nil, {:mnemonic => 'another_mn'}).once.returns(test_response(test_customer))
-        c = Stripe::Customer.construct_from(test_customer)
+        c = Webpay::Customer.construct_from(test_customer)
         c.mnemonic = "another_mn"
         c.save
       end
 
       should "updating should merge in returned properties" do
         @mock.expects(:post).once.returns(test_response(test_customer))
-        c = Stripe::Customer.new("c_test_customer")
+        c = Webpay::Customer.new("c_test_customer")
         c.mnemonic = "another_mn"
         c.save
         assert_equal false, c.livemode
@@ -240,7 +240,7 @@ class TestStripeRuby < Test::Unit::TestCase
         @mock.expects(:post).never
         @mock.expects(:delete).with("https://api.stripe.com/v1/customers/c_test_customer", nil, nil).once.returns(test_response({ "id" => "test_customer", "deleted" => true }))
 
-        c = Stripe::Customer.construct_from(test_customer)
+        c = Webpay::Customer.construct_from(test_customer)
         c.delete
         assert_equal true, c.deleted
 
@@ -251,23 +251,23 @@ class TestStripeRuby < Test::Unit::TestCase
 
       should "loading an object with properties that have specific types should instantiate those classes" do
         @mock.expects(:get).once.returns(test_response(test_charge))
-        c = Stripe::Charge.retrieve("test_charge")
-        assert c.card.kind_of?(Stripe::StripeObject) && c.card.object == 'card'
+        c = Webpay::Charge.retrieve("test_charge")
+        assert c.card.kind_of?(Webpay::WebpayObject) && c.card.object == 'card'
       end
 
       should "loading all of an APIResource should return an array of recursively instantiated objects" do
         @mock.expects(:get).once.returns(test_response(test_charge_array))
-        c = Stripe::Charge.all.data
+        c = Webpay::Charge.all.data
         assert c.kind_of? Array
-        assert c[0].kind_of? Stripe::Charge
-        assert c[0].card.kind_of?(Stripe::StripeObject) && c[0].card.object == 'card'
+        assert c[0].kind_of? Webpay::Charge
+        assert c[0].card.kind_of?(Webpay::WebpayObject) && c[0].card.object == 'card'
       end
 
       context "account tests" do
         should "account should be retrievable" do
           resp = {:email => "test+bindings@stripe.com", :charge_enabled => false, :details_submitted => false}
           @mock.expects(:get).once.returns(test_response(resp))
-          a = Stripe::Account.retrieve
+          a = Webpay::Account.retrieve
           assert_equal "test+bindings@stripe.com", a.email
           assert !a.charge_enabled
           assert !a.details_submitted
@@ -278,14 +278,14 @@ class TestStripeRuby < Test::Unit::TestCase
 
         should "charges should be listable" do
           @mock.expects(:get).once.returns(test_response(test_charge_array))
-          c = Stripe::Charge.all.data
+          c = Webpay::Charge.all.data
           assert c.kind_of? Array
         end
 
         should "charges should be refundable" do
           @mock.expects(:get).never
           @mock.expects(:post).once.returns(test_response({:id => "ch_test_charge", :refunded => true}))
-          c = Stripe::Charge.new("test_charge")
+          c = Webpay::Charge.new("test_charge")
           c.refund
           assert c.refunded
         end
@@ -293,7 +293,7 @@ class TestStripeRuby < Test::Unit::TestCase
         should "charges should not be deletable" do
           assert_raises NoMethodError do
             @mock.expects(:get).once.returns(test_response(test_charge))
-            c = Stripe::Charge.retrieve("test_charge")
+            c = Webpay::Charge.retrieve("test_charge")
             c.delete
           end
         end
@@ -301,7 +301,7 @@ class TestStripeRuby < Test::Unit::TestCase
         should "charges should be updateable" do
           @mock.expects(:get).once.returns(test_response(test_charge))
           @mock.expects(:post).once.returns(test_response(test_charge))
-          c = Stripe::Charge.new("test_charge")
+          c = Webpay::Charge.new("test_charge")
           c.refresh
           c.mnemonic = "New charge description"
           c.save
@@ -309,8 +309,8 @@ class TestStripeRuby < Test::Unit::TestCase
 
         should "charges should have Card objects associated with their Card property" do
           @mock.expects(:get).once.returns(test_response(test_charge))
-          c = Stripe::Charge.retrieve("test_charge")
-          assert c.card.kind_of?(Stripe::StripeObject) && c.card.object == 'card'
+          c = Webpay::Charge.retrieve("test_charge")
+          assert c.card.kind_of?(Webpay::WebpayObject) && c.card.object == 'card'
         end
 
         should "execute should return a new, fully executed charge when passed correct parameters" do
@@ -319,7 +319,7 @@ class TestStripeRuby < Test::Unit::TestCase
             :card => {:exp_year => 2012, :number => '4242424242424242', :exp_month => 11}
           }).once.returns(test_response(test_charge))
 
-          c = Stripe::Charge.create({
+          c = Webpay::Charge.create({
             :amount => 100,
             :card => {
               :number => "4242424242424242",
@@ -337,14 +337,14 @@ class TestStripeRuby < Test::Unit::TestCase
 
         should "customers should be listable" do
           @mock.expects(:get).once.returns(test_response(test_customer_array))
-          c = Stripe::Customer.all.data
+          c = Webpay::Customer.all.data
           assert c.kind_of? Array
-          assert c[0].kind_of? Stripe::Customer
+          assert c[0].kind_of? Webpay::Customer
         end
 
         should "customers should be deletable" do
           @mock.expects(:delete).once.returns(test_response(test_customer({:deleted => true})))
-          c = Stripe::Customer.new("test_customer")
+          c = Webpay::Customer.new("test_customer")
           c.delete
           assert c.deleted
         end
@@ -352,7 +352,7 @@ class TestStripeRuby < Test::Unit::TestCase
         should "customers should be updateable" do
           @mock.expects(:get).once.returns(test_response(test_customer({:mnemonic => "foo"})))
           @mock.expects(:post).once.returns(test_response(test_customer({:mnemonic => "bar"})))
-          c = Stripe::Customer.new("test_customer").refresh
+          c = Webpay::Customer.new("test_customer").refresh
           assert_equal c.mnemonic, "foo"
           c.mnemonic = "bar"
           c.save
@@ -361,19 +361,19 @@ class TestStripeRuby < Test::Unit::TestCase
 
         should "customers should have Card objects associated with their active_ard property" do
           @mock.expects(:get).once.returns(test_response(test_customer))
-          c = Stripe::Customer.retrieve("test_customer")
-          assert c.active_card.kind_of?(Stripe::StripeObject) && c.active_card.object == 'card'
+          c = Webpay::Customer.retrieve("test_customer")
+          assert c.active_card.kind_of?(Webpay::WebpayObject) && c.active_card.object == 'card'
         end
 
         should "create should return a new customer" do
           @mock.expects(:post).once.returns(test_response(test_customer))
-          c = Stripe::Customer.create
+          c = Webpay::Customer.create
           assert_equal "c_test_customer", c.id
         end
 
         should "be able to update a customer's subscription" do
           @mock.expects(:get).once.returns(test_response(test_customer))
-          c = Stripe::Customer.retrieve("test_customer")
+          c = Webpay::Customer.retrieve("test_customer")
 
           @mock.expects(:post).once.with("https://api.stripe.com/v1/customers/c_test_customer/subscription", nil, {:plan => 'silver'}).returns(test_response(test_subscription('silver')))
           s = c.update_subscription({:plan => 'silver'})
@@ -384,7 +384,7 @@ class TestStripeRuby < Test::Unit::TestCase
 
         should "be able to cancel a customer's subscription" do
           @mock.expects(:get).once.returns(test_response(test_customer))
-          c = Stripe::Customer.retrieve("test_customer")
+          c = Webpay::Customer.retrieve("test_customer")
 
           # Not an accurate response, but whatever
           
@@ -397,7 +397,7 @@ class TestStripeRuby < Test::Unit::TestCase
 
         should "be able to delete a customer's discount" do
           @mock.expects(:get).once.returns(test_response(test_customer))
-          c = Stripe::Customer.retrieve("test_customer")
+          c = Webpay::Customer.retrieve("test_customer")
 
           @mock.expects(:delete).once.with("https://api.stripe.com/v1/customers/c_test_customer/discount", nil, nil).returns(test_response(test_delete_discount_response))
           s = c.delete_discount
@@ -411,7 +411,7 @@ class TestStripeRuby < Test::Unit::TestCase
       context "coupon tests" do
         should "create should return a new coupon" do
           @mock.expects(:post).once.returns(test_response(test_coupon))
-          c = Stripe::Coupon.create
+          c = Webpay::Coupon.create
           assert_equal "co_test_coupon", c.id
         end
       end
@@ -422,10 +422,10 @@ class TestStripeRuby < Test::Unit::TestCase
           @mock.expects(:get).once.raises(RestClient::ExceptionWithResponse.new(response, 404))
 
           begin
-            Stripe::Customer.new("test_customer").refresh
+            Webpay::Customer.new("test_customer").refresh
             assert false #shouldn't get here either
-          rescue Stripe::InvalidRequestError => e # we don't use assert_raises because we want to examine e
-            assert e.kind_of? Stripe::InvalidRequestError
+          rescue Webpay::InvalidRequestError => e # we don't use assert_raises because we want to examine e
+            assert e.kind_of? Webpay::InvalidRequestError
             assert_equal "id", e.param
             assert_equal "Missing id", e.message
             return
@@ -439,10 +439,10 @@ class TestStripeRuby < Test::Unit::TestCase
           @mock.expects(:get).once.raises(RestClient::ExceptionWithResponse.new(response, 500))
 
           begin
-            Stripe::Customer.new("test_customer").refresh
+            Webpay::Customer.new("test_customer").refresh
             assert false #shouldn't get here either
-          rescue Stripe::APIError => e # we don't use assert_raises because we want to examine e
-            assert e.kind_of? Stripe::APIError
+          rescue Webpay::APIError => e # we don't use assert_raises because we want to examine e
+            assert e.kind_of? Webpay::APIError
             return
           end
 
@@ -454,10 +454,10 @@ class TestStripeRuby < Test::Unit::TestCase
           @mock.expects(:get).once.raises(RestClient::ExceptionWithResponse.new(response, 402))
 
           begin
-            Stripe::Customer.new("test_customer").refresh
+            Webpay::Customer.new("test_customer").refresh
             assert false #shouldn't get here either
-          rescue Stripe::CardError => e # we don't use assert_raises because we want to examine e
-            assert e.kind_of? Stripe::CardError
+          rescue Webpay::CardError => e # we don't use assert_raises because we want to examine e
+            assert e.kind_of? Webpay::CardError
             assert_equal "invalid_expiry_year", e.code
             assert_equal "exp_year", e.param
             assert_equal "Your card's expiration year is invalid", e.message

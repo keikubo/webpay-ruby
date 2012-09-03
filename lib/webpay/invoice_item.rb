@@ -1,8 +1,8 @@
-module Stripe
+module Webpay
   class InvoiceItem < APIResource
-    include Stripe::APIOperations::List
-    include Stripe::APIOperations::Create
-    include Stripe::APIOperations::Delete
-    include Stripe::APIOperations::Update
+    include Webpay::APIOperations::List
+    include Webpay::APIOperations::Create
+    include Webpay::APIOperations::Delete
+    include Webpay::APIOperations::Update
   end
 end

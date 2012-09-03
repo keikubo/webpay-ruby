@@ -1,5 +1,5 @@
-module Stripe
+module Webpay
   class Event < APIResource
-    include Stripe::APIOperations::List
+    include Webpay::APIOperations::List
   end
 end

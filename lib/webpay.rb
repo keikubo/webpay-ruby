@@ -1,4 +1,4 @@
-# Stripe Ruby bindings
+# Webpay Ruby bindings
 # API spec at http://stripe.com/api/spec
 require 'cgi'
 require 'set'
@@ -43,7 +43,7 @@ require 'stripe/errors/card_error'
 require 'stripe/errors/invalid_request_error'
 require 'stripe/errors/authentication_error'
 
-module Stripe
+module Webpay
   @@ssl_bundle_path = File.join(File.dirname(__FILE__), 'data/ca-certificates.crt')
   @@api_key = nil
   @@api_base = 'https://api.stripe.com/v1'
@@ -79,11 +79,11 @@ module Stripe
 
   def self.request(method, url, api_key, params=nil, headers={})
     api_key ||= @@api_key
-    raise AuthenticationError.new('No API key provided.  (HINT: set your API key using "Stripe.api_key = <API-KEY>".  You can generate API keys from the Stripe web interface.  See https://stripe.com/api for details, or email support@stripe.com if you have any questions.)') unless api_key
+    raise AuthenticationError.new('No API key provided.  (HINT: set your API key using "Webpay.api_key = <API-KEY>".  You can generate API keys from the Webpay web interface.  See https://stripe.com/api for details, or email support@stripe.com if you have any questions.)') unless api_key
 
     if !verify_ssl_certs
       unless @no_verify
-        $stderr.puts "WARNING: Running without SSL cert verification.  Execute 'Stripe.verify_ssl_certs = true' to enable verification."
+        $stderr.puts "WARNING: Running without SSL cert verification.  Execute 'Webpay.verify_ssl_certs = true' to enable verification."
         @no_verify = true
       end
       ssl_opts = { :verify_ssl => false }
@@ -102,7 +102,7 @@ module Stripe
     uname = (@@uname ||= RUBY_PLATFORM =~ /linux|darwin/i ? `uname -a 2>/dev/null`.strip : nil)
     lang_version = "#{RUBY_VERSION} p#{RUBY_PATCHLEVEL} (#{RUBY_RELEASE_DATE})"
     ua = {
-      :bindings_version => Stripe::VERSION,
+      :bindings_version => Webpay::VERSION,
       :lang => 'ruby',
       :lang_version => lang_version,
       :platform => RUBY_PLATFORM,
@@ -125,7 +125,7 @@ module Stripe
     end
 
     begin
-      headers = { :x_stripe_client_user_agent => Stripe::JSON.dump(ua) }.merge(headers)
+      headers = { :x_stripe_client_user_agent => Webpay::JSON.dump(ua) }.merge(headers)
     rescue => e
       headers = {
         :x_stripe_client_raw_user_agent => ua.inspect,
@@ -134,7 +134,7 @@ module Stripe
     end
 
     headers = {
-      :user_agent => "Stripe/v1 RubyBindings/#{Stripe::VERSION}",
+      :user_agent => "Webpay/v1 RubyBindings/#{Webpay::VERSION}",
       :authorization => "Bearer #{api_key}"
     }.merge(headers)
     opts = {
@@ -173,7 +173,7 @@ module Stripe
     begin
       # Would use :symbolize_names => true, but apparently there is
       # some library out there that makes symbolize_names not work.
-      resp = Stripe::JSON.load(rbody)
+      resp = Webpay::JSON.load(rbody)
     rescue MultiJson::DecodeError
       raise APIError.new("Invalid response object from API: #{rbody.inspect} (HTTP response code was #{rcode})", rcode, rbody)
     end
@@ -190,10 +190,10 @@ module Stripe
 
   def self.handle_api_error(rcode, rbody)
     begin
-      error_obj = Stripe::JSON.load(rbody)
+      error_obj = Webpay::JSON.load(rbody)
       error_obj = Util.symbolize_names(error_obj)
-      error = error_obj[:error] or raise StripeError.new # escape from parsing
-    rescue MultiJson::DecodeError, StripeError
+      error = error_obj[:error] or raise WebpayError.new # escape from parsing
+    rescue MultiJson::DecodeError, WebpayError
       raise APIError.new("Invalid response object from API: #{rbody.inspect} (HTTP response code was #{rcode})", rcode, rbody)
     end
 
@@ -228,13 +228,13 @@ module Stripe
   def self.handle_restclient_error(e)
     case e
     when RestClient::ServerBrokeConnection, RestClient::RequestTimeout
-      message = "Could not connect to Stripe (#{@@api_base}).  Please check your internet connection and try again.  If this problem persists, you should check Stripe's service status at https://twitter.com/stripestatus, or let us know at support@stripe.com."
+      message = "Could not connect to Webpay (#{@@api_base}).  Please check your internet connection and try again.  If this problem persists, you should check Webpay's service status at https://twitter.com/stripestatus, or let us know at support@stripe.com."
     when RestClient::SSLCertificateNotVerified
-      message = "Could not verify Stripe's SSL certificate.  Please make sure that your network is not intercepting certificates.  (Try going to https://api.stripe.com/v1 in your browser.)  If this problem persists, let us know at support@stripe.com."
+      message = "Could not verify Webpay's SSL certificate.  Please make sure that your network is not intercepting certificates.  (Try going to https://api.stripe.com/v1 in your browser.)  If this problem persists, let us know at support@stripe.com."
     when SocketError
-      message = "Unexpected error communicating when trying to connect to Stripe.  HINT: You may be seeing this message because your DNS is not working.  To check, try running 'host stripe.com' from the command line."
+      message = "Unexpected error communicating when trying to connect to Webpay.  HINT: You may be seeing this message because your DNS is not working.  To check, try running 'host stripe.com' from the command line."
     else
-      message = "Unexpected error communicating with Stripe.  If this problem persists, let us know at support@stripe.com."
+      message = "Unexpected error communicating with Webpay.  If this problem persists, let us know at support@stripe.com."
     end
     message += "\n\n(Network error: #{e.message})"
     raise APIConnectionError.new(message)

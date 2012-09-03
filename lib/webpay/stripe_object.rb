@@ -1,5 +1,5 @@
-module Stripe
-  class StripeObject
+module Webpay
+  class WebpayObject
     include Enumerable
 
     attr_accessor :api_key
@@ -27,12 +27,12 @@ module Stripe
     end
 
     def to_s(*args)
-      Stripe::JSON.dump(@values, :pretty => true)
+      Webpay::JSON.dump(@values, :pretty => true)
     end
 
     def inspect()
       id_string = (self.respond_to?(:id) && !self.id.nil?) ? " id=#{self.id}" : ""
-      "#<#{self.class}:0x#{self.object_id.to_s(16)}#{id_string}> JSON: " + Stripe::JSON.dump(@values, :pretty => true)
+      "#<#{self.class}:0x#{self.object_id.to_s(16)}#{id_string}> JSON: " + Webpay::JSON.dump(@values, :pretty => true)
     end
 
     def refresh_from(values, api_key, partial=false)
@@ -78,7 +78,7 @@ module Stripe
     end
 
     def to_json(*a)
-      Stripe::JSON.dump(@values)
+      Webpay::JSON.dump(@values)
     end
 
     def as_json(*a)
@@ -140,7 +140,7 @@ module Stripe
         super
       rescue NoMethodError => e
         if @transient_values.include?(name)
-          raise NoMethodError.new(e.message + ".  HINT: The '#{name}' attribute was set in the past, however.  It was then wiped when refreshing the object with the result returned by Stripe's API, probably as a result of a save().  The attributes currently available on this object are: #{@values.keys.join(', ')}")
+          raise NoMethodError.new(e.message + ".  HINT: The '#{name}' attribute was set in the past, however.  It was then wiped when refreshing the object with the result returned by Webpay's API, probably as a result of a save().  The attributes currently available on this object are: #{@values.keys.join(', ')}")
         else
           raise
         end

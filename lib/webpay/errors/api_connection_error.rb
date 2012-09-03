@@ -1,4 +1,4 @@
-module Stripe
-  class APIConnectionError < StripeError
+module Webpay
+  class APIConnectionError < WebpayError
   end
 end

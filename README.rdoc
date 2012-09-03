@@ -1,9 +1,9 @@
-= Stripe Ruby bindings {<img src="https://gemnasium.com/stripe/stripe-ruby.png" alt="Dependency Status" />}[https://gemnasium.com/stripe/stripe-ruby]
+= Webpay Ruby bindings {<img src="https://gemnasium.com/stripe/stripe-ruby.png" alt="Dependency Status" />}[https://gemnasium.com/stripe/stripe-ruby]
 
 == Installation
 
 You don't need this source code unless you want to modify the gem. If
-you just want to use the Stripe Ruby bindings, you should run:
+you just want to use the Webpay Ruby bindings, you should run:
 
   sudo gem install --source https://code.stripe.com stripe
 

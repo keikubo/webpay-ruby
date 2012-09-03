@@ -1,5 +1,5 @@
-module Stripe
-  class APIResource < StripeObject
+module Webpay
+  class APIResource < WebpayObject
     def self.class_name
       self.name.split('::')[-1]
     end
@@ -19,7 +19,7 @@ module Stripe
     end
 
     def refresh
-      response, api_key = Stripe.request(:get, url, @api_key)
+      response, api_key = Webpay.request(:get, url, @api_key)
       refresh_from(response, api_key)
       self
     end

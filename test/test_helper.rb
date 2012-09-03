@@ -5,7 +5,7 @@ require 'mocha'
 include Mocha
 
 #monkeypatch request methods
-module Stripe   
+module Webpay   
   @mock_rest_client = nil
 
   def self.mock_rest_client=(mock_client)

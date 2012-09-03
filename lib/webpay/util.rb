@@ -1,4 +1,4 @@
-module Stripe
+module Webpay
   module Util
     def self.objects_to_ids(h)
       case h
@@ -34,7 +34,7 @@ module Stripe
         if klass_name = resp[:object]
           klass = types[klass_name]
         end
-        klass ||= StripeObject
+        klass ||= WebpayObject
         klass.construct_from(resp, api_key)
       else
         resp

@@ -4,9 +4,9 @@ require 'stripe/version'
 
 spec = Gem::Specification.new do |s|
   s.name = 'stripe'
-  s.version = Stripe::VERSION
-  s.summary = 'Ruby bindings for the Stripe API'
-  s.description = 'Stripe is the easiest way to accept payments online.  See https://stripe.com for details.'
+  s.version = Webpay::VERSION
+  s.summary = 'Ruby bindings for the Webpay API'
+  s.description = 'Webpay is the easiest way to accept payments online.  See https://stripe.com for details.'
   s.authors = ['Ross Boucher', 'Greg Brockman']
   s.email = ['boucher@stripe.com', 'gdb@stripe.com']
   s.homepage = 'https://stripe.com/api'

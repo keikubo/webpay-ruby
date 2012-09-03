@@ -1,4 +1,4 @@
-module Stripe
+module Webpay
   class SingletonAPIResource < APIResource
     def self.url()
       if self == SingletonAPIResource

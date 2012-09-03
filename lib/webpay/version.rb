@@ -1,3 +1,3 @@
-module Stripe
+module Webpay
   VERSION = '1.7.2'
 end

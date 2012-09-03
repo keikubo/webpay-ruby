@@ -1,4 +1,4 @@
-module Stripe
+module Webpay
   module JSON
     if MultiJson.respond_to?(:dump)
       def self.dump(*args)

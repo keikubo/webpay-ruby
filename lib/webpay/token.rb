@@ -1,5 +1,5 @@
-module Stripe
+module Webpay
   class Token < APIResource
-    include Stripe::APIOperations::Create
+    include Webpay::APIOperations::Create
   end
 end

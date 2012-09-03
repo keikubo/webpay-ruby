@@ -1,4 +1,4 @@
-module Stripe
-  class AuthenticationError < StripeError
+module Webpay
+  class AuthenticationError < WebpayError
   end
 end

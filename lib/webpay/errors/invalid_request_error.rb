@@ -1,5 +1,5 @@
-module Stripe
-  class InvalidRequestError < StripeError
+module Webpay
+  class InvalidRequestError < WebpayError
     attr_accessor :param
 
     def initialize(message, param, http_status=nil, http_body=nil, json_body=nil)
