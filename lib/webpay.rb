@@ -4,6 +4,7 @@ require 'cgi'
 require 'set'
 require 'rubygems'
 require 'openssl'
+require 'base64'
 
 gem 'rest-client', '~> 1.4'
 require 'rest_client'
@@ -46,7 +47,8 @@ require 'webpay/errors/authentication_error'
 module Webpay
   @@ssl_bundle_path = File.join(File.dirname(__FILE__), 'data/ca-certificates.crt')
   @@api_key = nil
-  @@api_base = 'https://api.webpay.com/v1'
+  # @@api_base = 'https://api.webpay.jp/v1'
+  @@api_base = 'https://stripe.rackbox.net/v1'
   @@verify_ssl_certs = true
 
   def self.api_url(url='')
@@ -135,7 +137,7 @@ module Webpay
 
     headers = {
       :user_agent => "Webpay/v1 RubyBindings/#{Webpay::VERSION}",
-      :authorization => "Bearer #{api_key}"
+      :authorization => "Basic #{Base64.encode64(api_key)}"
     }.merge(headers)
     opts = {
       :method => method,
