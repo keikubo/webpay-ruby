@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    webpay (1.7.2.1)
+    webpay (1.7.2.2)
       multi_json (~> 1.1)
       rest-client (~> 1.4)
 
