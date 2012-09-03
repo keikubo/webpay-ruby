@@ -1,5 +1,5 @@
 # Webpay Ruby bindings
-# API spec at http://webpay.com/api/spec
+# API spec at http://webpay.jp/api/spec
 require 'cgi'
 require 'set'
 require 'rubygems'
@@ -81,7 +81,7 @@ module Webpay
 
   def self.request(method, url, api_key, params=nil, headers={})
     api_key ||= @@api_key
-    raise AuthenticationError.new('No API key provided.  (HINT: set your API key using "Webpay.api_key = <API-KEY>".  You can generate API keys from the Webpay web interface.  See https://webpay.com/api for details, or email support@webpay.com if you have any questions.)') unless api_key
+    raise AuthenticationError.new('No API key provided.  (HINT: set your API key using "Webpay.api_key = <API-KEY>".  You can generate API keys from the Webpay web interface.  See https://webpay.jp/api for details, or email support@webpay.jp if you have any questions.)') unless api_key
 
     if !verify_ssl_certs
       unless @no_verify
@@ -230,13 +230,13 @@ module Webpay
   def self.handle_restclient_error(e)
     case e
     when RestClient::ServerBrokeConnection, RestClient::RequestTimeout
-      message = "Could not connect to Webpay (#{@@api_base}).  Please check your internet connection and try again.  If this problem persists, you should check Webpay's service status at https://twitter.com/webpaystatus, or let us know at support@webpay.com."
+      message = "Could not connect to Webpay (#{@@api_base}).  Please check your internet connection and try again.  If this problem persists, you should check Webpay's service status at https://twitter.com/webpaystatus, or let us know at support@webpay.jp."
     when RestClient::SSLCertificateNotVerified
-      message = "Could not verify Webpay's SSL certificate.  Please make sure that your network is not intercepting certificates.  (Try going to https://api.webpay.com/v1 in your browser.)  If this problem persists, let us know at support@webpay.com."
+      message = "Could not verify Webpay's SSL certificate.  Please make sure that your network is not intercepting certificates.  (Try going to https://api.webpay.jp/v1 in your browser.)  If this problem persists, let us know at support@webpay.jp."
     when SocketError
-      message = "Unexpected error communicating when trying to connect to Webpay.  HINT: You may be seeing this message because your DNS is not working.  To check, try running 'host webpay.com' from the command line."
+      message = "Unexpected error communicating when trying to connect to Webpay.  HINT: You may be seeing this message because your DNS is not working.  To check, try running 'host webpay.jp' from the command line."
     else
-      message = "Unexpected error communicating with Webpay.  If this problem persists, let us know at support@webpay.com."
+      message = "Unexpected error communicating with Webpay.  If this problem persists, let us know at support@webpay.jp."
     end
     message += "\n\n(Network error: #{e.message})"
     raise APIConnectionError.new(message)
