@@ -1,16 +1,16 @@
 $:.unshift(File.join(File.dirname(__FILE__), 'lib'))
 
-require 'stripe/version'
+require 'webpay/version'
 
 spec = Gem::Specification.new do |s|
-  s.name = 'stripe'
+  s.name = 'webpay'
   s.version = Webpay::VERSION
   s.summary = 'Ruby bindings for the Webpay API'
-  s.description = 'Webpay is the easiest way to accept payments online.  See https://stripe.com for details.'
+  s.description = 'Webpay is the easiest way to accept payments online.  See https://webpay.com for details.'
   s.authors = ['Ross Boucher', 'Greg Brockman']
-  s.email = ['boucher@stripe.com', 'gdb@stripe.com']
-  s.homepage = 'https://stripe.com/api'
-  s.executables = 'stripe-console'
+  s.email = ['boucher@webpay.com', 'gdb@webpay.com']
+  s.homepage = 'https://webpay.com/api'
+  s.executables = 'webpay-console'
   s.require_paths = %w{lib}
 
   s.add_dependency('rest-client', '~> 1.4')

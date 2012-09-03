@@ -1,5 +1,5 @@
 # Webpay Ruby bindings
-# API spec at http://stripe.com/api/spec
+# API spec at http://webpay.com/api/spec
 require 'cgi'
 require 'set'
 require 'rubygems'
@@ -10,43 +10,43 @@ require 'rest_client'
 require 'multi_json'
 
 # Version
-require 'stripe/version'
+require 'webpay/version'
 
 # API operations
-require 'stripe/api_operations/create'
-require 'stripe/api_operations/update'
-require 'stripe/api_operations/delete'
-require 'stripe/api_operations/list'
+require 'webpay/api_operations/create'
+require 'webpay/api_operations/update'
+require 'webpay/api_operations/delete'
+require 'webpay/api_operations/list'
 
 # Resources
-require 'stripe/util'
-require 'stripe/json'
-require 'stripe/stripe_object'
-require 'stripe/api_resource'
-require 'stripe/singleton_api_resource'
-require 'stripe/account'
-require 'stripe/customer'
-require 'stripe/invoice'
-require 'stripe/invoice_item'
-require 'stripe/charge'
-require 'stripe/plan'
-require 'stripe/coupon'
-require 'stripe/token'
-require 'stripe/event'
-require 'stripe/transfer'
+require 'webpay/util'
+require 'webpay/json'
+require 'webpay/webpay_object'
+require 'webpay/api_resource'
+require 'webpay/singleton_api_resource'
+require 'webpay/account'
+require 'webpay/customer'
+require 'webpay/invoice'
+require 'webpay/invoice_item'
+require 'webpay/charge'
+require 'webpay/plan'
+require 'webpay/coupon'
+require 'webpay/token'
+require 'webpay/event'
+require 'webpay/transfer'
 
 # Errors
-require 'stripe/errors/stripe_error'
-require 'stripe/errors/api_error'
-require 'stripe/errors/api_connection_error'
-require 'stripe/errors/card_error'
-require 'stripe/errors/invalid_request_error'
-require 'stripe/errors/authentication_error'
+require 'webpay/errors/webpay_error'
+require 'webpay/errors/api_error'
+require 'webpay/errors/api_connection_error'
+require 'webpay/errors/card_error'
+require 'webpay/errors/invalid_request_error'
+require 'webpay/errors/authentication_error'
 
 module Webpay
   @@ssl_bundle_path = File.join(File.dirname(__FILE__), 'data/ca-certificates.crt')
   @@api_key = nil
-  @@api_base = 'https://api.stripe.com/v1'
+  @@api_base = 'https://api.webpay.com/v1'
   @@verify_ssl_certs = true
 
   def self.api_url(url='')
@@ -79,7 +79,7 @@ module Webpay
 
   def self.request(method, url, api_key, params=nil, headers={})
     api_key ||= @@api_key
-    raise AuthenticationError.new('No API key provided.  (HINT: set your API key using "Webpay.api_key = <API-KEY>".  You can generate API keys from the Webpay web interface.  See https://stripe.com/api for details, or email support@stripe.com if you have any questions.)') unless api_key
+    raise AuthenticationError.new('No API key provided.  (HINT: set your API key using "Webpay.api_key = <API-KEY>".  You can generate API keys from the Webpay web interface.  See https://webpay.com/api for details, or email support@webpay.com if you have any questions.)') unless api_key
 
     if !verify_ssl_certs
       unless @no_verify
@@ -106,7 +106,7 @@ module Webpay
       :lang => 'ruby',
       :lang_version => lang_version,
       :platform => RUBY_PLATFORM,
-      :publisher => 'stripe',
+      :publisher => 'webpay',
       :uname => uname
     }
 
@@ -125,10 +125,10 @@ module Webpay
     end
 
     begin
-      headers = { :x_stripe_client_user_agent => Webpay::JSON.dump(ua) }.merge(headers)
+      headers = { :x_webpay_client_user_agent => Webpay::JSON.dump(ua) }.merge(headers)
     rescue => e
       headers = {
-        :x_stripe_client_raw_user_agent => ua.inspect,
+        :x_webpay_client_raw_user_agent => ua.inspect,
         :error => "#{e} (#{e.class})"
       }.merge(headers)
     end
@@ -228,13 +228,13 @@ module Webpay
   def self.handle_restclient_error(e)
     case e
     when RestClient::ServerBrokeConnection, RestClient::RequestTimeout
-      message = "Could not connect to Webpay (#{@@api_base}).  Please check your internet connection and try again.  If this problem persists, you should check Webpay's service status at https://twitter.com/stripestatus, or let us know at support@stripe.com."
+      message = "Could not connect to Webpay (#{@@api_base}).  Please check your internet connection and try again.  If this problem persists, you should check Webpay's service status at https://twitter.com/webpaystatus, or let us know at support@webpay.com."
     when RestClient::SSLCertificateNotVerified
-      message = "Could not verify Webpay's SSL certificate.  Please make sure that your network is not intercepting certificates.  (Try going to https://api.stripe.com/v1 in your browser.)  If this problem persists, let us know at support@stripe.com."
+      message = "Could not verify Webpay's SSL certificate.  Please make sure that your network is not intercepting certificates.  (Try going to https://api.webpay.com/v1 in your browser.)  If this problem persists, let us know at support@webpay.com."
     when SocketError
-      message = "Unexpected error communicating when trying to connect to Webpay.  HINT: You may be seeing this message because your DNS is not working.  To check, try running 'host stripe.com' from the command line."
+      message = "Unexpected error communicating when trying to connect to Webpay.  HINT: You may be seeing this message because your DNS is not working.  To check, try running 'host webpay.com' from the command line."
     else
-      message = "Unexpected error communicating with Webpay.  If this problem persists, let us know at support@stripe.com."
+      message = "Unexpected error communicating with Webpay.  If this problem persists, let us know at support@webpay.com."
     end
     message += "\n\n(Network error: #{e.message})"
     raise APIConnectionError.new(message)

@@ -4,7 +4,7 @@ module Webpay
       module ClassMethods
         def all(filters={}, api_key=nil)
           response, api_key = Webpay.request(:get, url, api_key, filters)
-          Util.convert_to_stripe_object(response, api_key)
+          Util.convert_to_webpay_object(response, api_key)
         end
       end
 

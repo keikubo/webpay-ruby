@@ -4,7 +4,7 @@ module Webpay
 
     def transactions(params={})
       response, api_key = Webpay.request(:get, transactions_url, @api_key, params)
-      Util.convert_to_stripe_object(response, api_key)
+      Util.convert_to_webpay_object(response, api_key)
     end
 
     private

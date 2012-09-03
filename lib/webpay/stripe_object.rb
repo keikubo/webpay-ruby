@@ -54,7 +54,7 @@ module Webpay
         @unsaved_values.delete(k)
       end
       values.each do |k, v|
-        @values[k] = Util.convert_to_stripe_object(v, api_key)
+        @values[k] = Util.convert_to_webpay_object(v, api_key)
         @transient_values.delete(k)
         @unsaved_values.delete(k)
       end

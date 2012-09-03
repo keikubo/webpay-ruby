@@ -165,18 +165,18 @@ class TestWebpayRuby < Test::Unit::TestCase
         @mock.expects(:get).with do |url, api_key, params|
           uri = URI(url)
           query = CGI.parse(uri.query)
-          (url =~ %r{^https://api.stripe.com/v1/charges?} &&
+          (url =~ %r{^https://api.webpay.com/v1/charges?} &&
            query.keys.sort == ['offset', 'sad'])
         end.returns(test_response({ :count => 1, :data => [test_charge] }))
         c = Webpay::Charge.all(:count => nil, :offset => 5, :sad => false)
 
-        @mock.expects(:post).with('https://api.stripe.com/v1/charges', nil, { :amount => 50, :currency => 'usd', :card => {} }).returns(test_response({ :count => 1, :data => [test_charge] }))
+        @mock.expects(:post).with('https://api.webpay.com/v1/charges', nil, { :amount => 50, :currency => 'usd', :card => {} }).returns(test_response({ :count => 1, :data => [test_charge] }))
         c = Webpay::Charge.create(:amount => 50, :currency => 'usd', :card => { :number => nil })
       end
 
       should "requesting with a unicode ID should result in a request" do
         response = test_response(test_missing_id_error, 404)
-        @mock.expects(:get).once.with("https://api.stripe.com/v1/customers/%E2%98%83", nil, nil).raises(RestClient::ExceptionWithResponse.new(response, 404))
+        @mock.expects(:get).once.with("https://api.webpay.com/v1/customers/%E2%98%83", nil, nil).raises(RestClient::ExceptionWithResponse.new(response, 404))
         c = Webpay::Customer.new("☃")
         assert_raises(Webpay::InvalidRequestError) { c.refresh }
       end
@@ -188,7 +188,7 @@ class TestWebpayRuby < Test::Unit::TestCase
 
       should "making a GET request with parameters should have a query string and no body" do
         params = { :limit => 1 }
-        @mock.expects(:get).once.with("https://api.stripe.com/v1/charges?limit=1", nil, nil).returns(test_response([test_charge]))
+        @mock.expects(:get).once.with("https://api.webpay.com/v1/charges?limit=1", nil, nil).returns(test_response([test_charge]))
         c = Webpay::Charge.all(params)
       end
 
@@ -221,7 +221,7 @@ class TestWebpayRuby < Test::Unit::TestCase
       end
 
       should "updating an object should issue a POST request with only the changed properties" do
-        @mock.expects(:post).with("https://api.stripe.com/v1/customers/c_test_customer", nil, {:mnemonic => 'another_mn'}).once.returns(test_response(test_customer))
+        @mock.expects(:post).with("https://api.webpay.com/v1/customers/c_test_customer", nil, {:mnemonic => 'another_mn'}).once.returns(test_response(test_customer))
         c = Webpay::Customer.construct_from(test_customer)
         c.mnemonic = "another_mn"
         c.save
@@ -238,7 +238,7 @@ class TestWebpayRuby < Test::Unit::TestCase
       should "deleting should send no props and result in an object that has no props other deleted" do
         @mock.expects(:get).never
         @mock.expects(:post).never
-        @mock.expects(:delete).with("https://api.stripe.com/v1/customers/c_test_customer", nil, nil).once.returns(test_response({ "id" => "test_customer", "deleted" => true }))
+        @mock.expects(:delete).with("https://api.webpay.com/v1/customers/c_test_customer", nil, nil).once.returns(test_response({ "id" => "test_customer", "deleted" => true }))
 
         c = Webpay::Customer.construct_from(test_customer)
         c.delete
@@ -265,10 +265,10 @@ class TestWebpayRuby < Test::Unit::TestCase
 
       context "account tests" do
         should "account should be retrievable" do
-          resp = {:email => "test+bindings@stripe.com", :charge_enabled => false, :details_submitted => false}
+          resp = {:email => "test+bindings@webpay.com", :charge_enabled => false, :details_submitted => false}
           @mock.expects(:get).once.returns(test_response(resp))
           a = Webpay::Account.retrieve
-          assert_equal "test+bindings@stripe.com", a.email
+          assert_equal "test+bindings@webpay.com", a.email
           assert !a.charge_enabled
           assert !a.details_submitted
         end
@@ -314,7 +314,7 @@ class TestWebpayRuby < Test::Unit::TestCase
         end
 
         should "execute should return a new, fully executed charge when passed correct parameters" do
-          @mock.expects(:post).with('https://api.stripe.com/v1/charges', nil, {
+          @mock.expects(:post).with('https://api.webpay.com/v1/charges', nil, {
             :currency => 'usd', :amount => 100,
             :card => {:exp_year => 2012, :number => '4242424242424242', :exp_month => 11}
           }).once.returns(test_response(test_charge))
@@ -375,7 +375,7 @@ class TestWebpayRuby < Test::Unit::TestCase
           @mock.expects(:get).once.returns(test_response(test_customer))
           c = Webpay::Customer.retrieve("test_customer")
 
-          @mock.expects(:post).once.with("https://api.stripe.com/v1/customers/c_test_customer/subscription", nil, {:plan => 'silver'}).returns(test_response(test_subscription('silver')))
+          @mock.expects(:post).once.with("https://api.webpay.com/v1/customers/c_test_customer/subscription", nil, {:plan => 'silver'}).returns(test_response(test_subscription('silver')))
           s = c.update_subscription({:plan => 'silver'})
 
           assert_equal 'subscription', s.object
@@ -388,10 +388,10 @@ class TestWebpayRuby < Test::Unit::TestCase
 
           # Not an accurate response, but whatever
           
-          @mock.expects(:delete).once.with("https://api.stripe.com/v1/customers/c_test_customer/subscription?at_period_end=true", nil, nil).returns(test_response(test_subscription('silver')))
+          @mock.expects(:delete).once.with("https://api.webpay.com/v1/customers/c_test_customer/subscription?at_period_end=true", nil, nil).returns(test_response(test_subscription('silver')))
           s = c.cancel_subscription({:at_period_end => 'true'})
 
-          @mock.expects(:delete).once.with("https://api.stripe.com/v1/customers/c_test_customer/subscription?", nil, nil).returns(test_response(test_subscription('silver')))
+          @mock.expects(:delete).once.with("https://api.webpay.com/v1/customers/c_test_customer/subscription?", nil, nil).returns(test_response(test_subscription('silver')))
           s = c.cancel_subscription
         end
 
@@ -399,7 +399,7 @@ class TestWebpayRuby < Test::Unit::TestCase
           @mock.expects(:get).once.returns(test_response(test_customer))
           c = Webpay::Customer.retrieve("test_customer")
 
-          @mock.expects(:delete).once.with("https://api.stripe.com/v1/customers/c_test_customer/discount", nil, nil).returns(test_response(test_delete_discount_response))
+          @mock.expects(:delete).once.with("https://api.webpay.com/v1/customers/c_test_customer/discount", nil, nil).returns(test_response(test_delete_discount_response))
           s = c.delete_discount
           assert_equal nil, c.discount
         end

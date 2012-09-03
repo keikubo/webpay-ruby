@@ -5,7 +5,7 @@ module Webpay
 
     def self.upcoming(params)
       response, api_key = Webpay.request(:get, upcoming_url, @api_key, params)
-      Util.convert_to_stripe_object(response, api_key)
+      Util.convert_to_webpay_object(response, api_key)
     end
 
     def pay

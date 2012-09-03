@@ -15,7 +15,7 @@ module Webpay
       end
     end
 
-    def self.convert_to_stripe_object(resp, api_key)
+    def self.convert_to_webpay_object(resp, api_key)
       types = {
         'charge' => Charge,
         'customer' => Customer,
@@ -28,7 +28,7 @@ module Webpay
       }
       case resp
       when Array
-        resp.map { |i| convert_to_stripe_object(i, api_key) }
+        resp.map { |i| convert_to_webpay_object(i, api_key) }
       when Hash
         # Try converting to a known object class.  If none available, fall back to generic APIResource
         if klass_name = resp[:object]

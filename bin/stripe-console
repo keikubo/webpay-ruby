@@ -2,6 +2,6 @@
 irb = RUBY_PLATFORM =~ /(:?mswin|mingw)/ ? 'irb.bat' : 'irb'
 
 libs =  " -r irb/completion"
-libs <<  " -r #{File.dirname(__FILE__) + '/../lib/stripe'}"
-puts "Loading stripe gem"
+libs <<  " -r #{File.dirname(__FILE__) + '/../lib/webpay'}"
+puts "Loading webpay gem"
 exec "#{irb} #{libs} --simple-prompt"

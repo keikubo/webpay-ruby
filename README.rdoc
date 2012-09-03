@@ -1,15 +1,15 @@
-= Webpay Ruby bindings {<img src="https://gemnasium.com/stripe/stripe-ruby.png" alt="Dependency Status" />}[https://gemnasium.com/stripe/stripe-ruby]
+= Webpay Ruby bindings {<img src="https://gemnasium.com/webpay/webpay-ruby.png" alt="Dependency Status" />}[https://gemnasium.com/webpay/webpay-ruby]
 
 == Installation
 
 You don't need this source code unless you want to modify the gem. If
 you just want to use the Webpay Ruby bindings, you should run:
 
-  sudo gem install --source https://code.stripe.com stripe
+  sudo gem install --source https://code.webpay.com webpay
 
 If you want to build the gem from source:
 
-  sudo gem build stripe.gemspec
+  sudo gem build webpay.gemspec
 
 == Requirements
 
@@ -19,9 +19,9 @@ If you want to build the gem from source:
 
 == Mirrors
 
-The stripe gem is mirrored on Rubygems, so you should be able to
-install it via <tt>gem install stripe</tt> if desired. We recommend using 
-the https://code.stripe.com mirror so all code is fetched over SSL.
+The webpay gem is mirrored on Rubygems, so you should be able to
+install it via <tt>gem install webpay</tt> if desired. We recommend using 
+the https://code.webpay.com mirror so all code is fetched over SSL.
 
 == Development
 

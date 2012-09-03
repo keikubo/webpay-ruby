@@ -1,6 +1,6 @@
 require 'stringio'
 require 'test/unit'
-require 'stripe'
+require 'webpay'
 require 'mocha'
 include Mocha
 
@@ -28,9 +28,9 @@ def test_response(body, code=200)
   # can't just use the stubs interface.
   body = MultiJson.dump(body) if !(body.kind_of? String)
   m = mock
-  m.instance_variable_set('@stripe_values', { :body => body, :code => code })
-  def m.body; @stripe_values[:body]; end
-  def m.code; @stripe_values[:code]; end
+  m.instance_variable_set('@webpay_values', { :body => body, :code => code })
+  def m.body; @webpay_values[:body]; end
+  def m.code; @webpay_values[:code]; end
   m
 end
 

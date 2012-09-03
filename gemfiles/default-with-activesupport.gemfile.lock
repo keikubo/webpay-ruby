@@ -1,7 +1,7 @@
 PATH
-  remote: /home/evan/src/stripe-ruby
+  remote: /home/evan/src/webpay-ruby
   specs:
-    stripe (1.7.0)
+    webpay (1.7.0)
       multi_json (~> 1.1)
       rest-client (~> 1.4)
 
@@ -35,5 +35,5 @@ DEPENDENCIES
   mocha
   rake
   shoulda
-  stripe!
+  webpay!
   test-unit
