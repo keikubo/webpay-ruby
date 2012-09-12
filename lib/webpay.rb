@@ -47,8 +47,7 @@ require 'webpay/errors/authentication_error'
 module Webpay
   @@ssl_bundle_path = File.join(File.dirname(__FILE__), 'data/ca-certificates.crt')
   @@api_key = nil
-  # @@api_base = 'https://api.webpay.jp/v1'
-  @@api_base = 'https://stripe.rackbox.net/v1'
+  @@api_base = 'https://api.webpay.jp/v1'
   @@verify_ssl_certs = true
 
   def self.api_url(url='')

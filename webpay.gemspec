@@ -8,8 +8,8 @@ spec = Gem::Specification.new do |s|
   s.summary = 'Ruby bindings for the Webpay API'
   s.description = 'Webpay is the easiest way to accept payments online.  See https://webpay.jp for details.'
   s.authors = ['Ross Boucher', 'Greg Brockman', 'Kei Kubo']
-  s.email = ['boucher@stripe.com', 'gdb@stripe.com']
-  s.homepage = 'https://webpay.jp/api'
+  s.email = ['boucher@stripe.com', 'gdb@stripe.com', 'keikubo@fluxflex.com']
+  s.homepage = 'https://webpay.jp/'
   s.executables = 'webpay-console'
   s.require_paths = %w{lib}
 
