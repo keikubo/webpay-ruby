@@ -1,15 +1,14 @@
-= Webpay Ruby bindings {<img src="https://gemnasium.com/webpay/webpay-ruby.png" alt="Dependency Status" />}[https://gemnasium.com/webpay/webpay-ruby]
 
 == Installation
 
 You don't need this source code unless you want to modify the gem. If
 you just want to use the Webpay Ruby bindings, you should run:
 
-  sudo gem install webpay
+  gem install webpay
 
 If you want to build the gem from source:
 
-  sudo gem build webpay.gemspec
+  gem build webpay.gemspec
 
 == Requirements
 
