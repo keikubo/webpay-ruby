@@ -1,3 +1,10 @@
+= WebPayは独自gemを開発する方針から、stripeのgemをそのまま利用し、互換性を高める戦略へ方針転換しました。
+
+引き続き、このwebpay gemを使用することはできますが、このgemの開発は一旦停止状態となります。
+
+= WebPay does not maintain this gem anymore, and recommend that our users use stripe gem directly to access to WebPay API.
+
+Stripe gem is a really great gem to use for WebPay because WebPay API is highly compatible to Stripe API.
 
 == Installation
 
